@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="buidl.js"></script>
+<link rel="stylesheet" href="bootstrap.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+html, body{
+	background-color: #343a40;
+	color: #fff;
+	font-family: "Arial", sans-serif;
+}
+#loaded-data{
+	display: none;
+}
+#loaddiv{
+	position: relative;
+	margin: auto;
+	width: 72%;
+	background-color: #222;
+	text-align: center;
+	padding: 13px;
+}
+#signdiv{
+	display: none;
+	position: relative;
+	margin: auto;
+	width: 72%;
+	background-color: #222;
+	text-align: center;
+	padding: 13px;
+}
+#loadbox{
+	width: 80%;
+}
+</style>
+</head>
+<body>
+<br><br>
+<div id="loaddiv">
+<input type="text" id="loadbox" placeholder="Paste your unsigned transaction here...">
+<br><br>
+<button onclick="return loadunsigned();">Load Unsigned Transaction</button>
+</div>
+<table width="100%" id="loaded-data">
+<tr>
+	<td width="65%"><h3>INPUT</h3>
+		<table width="100%">
+		<tr>
+			<td width="10">Type</td>
+			<td width="60%">Transaction Hash/ID</td>
+			<td width="10%">N Out</td>
+			<td width="20%">Input Value</td>
+		</tr>
+		<tr>
+			<td><input type="text" id="typei" size="10" onkeyup="return checkWitness();"></td>
+			<td><input type="text" id="txidi" size="65"></td>
+			<td><input type="text" id="outni" size="10"></td>
+			<td><input type="text" id="inputvalue" size="20"></td>
+		</tr>
+		<tr><td><input type="text" id="networktype"></td></tr>
+		</table>
+	</td>
+	
+	<td><h3>OUTPUT(S)</h3>
+		<table width="100%">
+		<tr>
+			<td width="70%">Address</td>
+			<td width="30%">Value</td>
+			
+		</tr>
+		<tr>
+			<td><input type="text" id="outputi" size="30"></td>
+			<td><input type="text" id="amounti"></td>
+		</tr>
+		<tr>
+			<td><input type="text" id="changeout" size="30"></td>
+			<td><input type="text" id="changeamt"></td>
+		</tr>
+		</table>
+	</td>
+</tr>
+</table>
+<br>
+<div id="signdiv">
+<p>WIF Private Key of Input</p>
+<input type="text" id="wifi" size="45">
+<br>
+<button onclick="return createTx();">Sign Transaction</button>
+<br><br>
+<textarea id="signedtxoutput" readonly cols="45" rows="13"></textarea>
+</div>
+<script>
+function loadunsigned(){
+	//get json input and parse it
+	var jsoninput = document.getElementById("loadbox").value;
+	var parsejson = JSON.parse(jsoninput);
+	document.getElementById("typei").value = parsejson["type"];
+	document.getElementById("txidi").value = parsejson["txid"];
+	document.getElementById("outni").value = parsejson["nout"];
+	document.getElementById("inputvalue").value = parsejson["inputvalue"];
+	document.getElementById("outputi").value = parsejson["output"];
+	document.getElementById("amounti").value = parsejson["outputamt"];
+	document.getElementById("changeout").value = parsejson["change"];
+	document.getElementById("changeamt").value = parsejson["changeamt"];
+	document.getElementById("networktype").value = parsejson["testnet"];
+	alert("Unsigned transaction loaded, now sign with your WIF private key.");
+	document.getElementById("signdiv").style.display = "block";
+}
+
+function createTx(){
+	let typei = document.getElementById("typei").value.trim();
+	let txidi = document.getElementById("txidi").value.trim();
+	let outni = parseInt(document.getElementById("outni").value.trim());
+	let inputvalue = parseInt(document.getElementById("inputvalue").value.trim());
+	inputvalue ? inputvalue : null;
+	let outputi = document.getElementById("outputi").value.trim();
+	let amounti = parseInt(document.getElementById("amounti").value.trim());
+	let changeout = document.getElementById("changeout").value.trim();
+	changeout ? changeout : null;
+	let changeamt = parseInt(document.getElementById("changeamt").value.trim());
+	changeamt ? changeamt : null;
+	let wifi = document.getElementById("wifi").value.trim();
+	let networktype = document.getElementById("networktype").value;
+	if(networktype=="testnet"){
+		network = "testnet";
+	} else {
+		network = null;
+	}
+	let rawtx = buidl.createTransaction(typei, txidi, outni, outputi, amounti, wifi, changeout, changeamt, inputvalue, network);
+	document.getElementById("signedtxoutput").innerHTML = rawtx.signedtx;
+	alert("Transaction signed, you can now broadcast the signed transaction hex to a node");
+}
+function checkWitness(){
+    let checkType = document.getElementById("typei").value.trim();
+	if(checkType === "1"){
+		document.getElementById("inputvalue").disabled = true;
+	} else {
+		document.getElementById("inputvalue").disabled = false;
+	}
+}
+</script>
+</body>
+</html>
