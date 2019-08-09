@@ -7,7 +7,7 @@ Load Unpacked Extension, point to this folder.
 Visit an address on the blockstream explorer
 Click the icon and press "Target Page"
 
-Still buggy and only can select one UTXO per page load.
+The interface is still buggy and only can select one UTXO per page load. Also 1 input max, up to 2 outputs max.
 
 Sign the unsigned transactions by copying the unsigned transaction hex and pasting it into the signor.html file. 
 Enter your private key and click sign button. 
